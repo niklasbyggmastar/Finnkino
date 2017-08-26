@@ -1,0 +1,21 @@
+{% include 'movieapp/header.html' %}
+
+    <h2>Theatres</h2>
+
+    {% if all_theatres %}
+      {% for theatre in all_theatres %}
+        <div class="col-md-4 well row">
+          <h3>{{ theatre.name }}</h3>
+          <h5>{{ theatre.city }}, {{ theatre.country }}</h5>
+          <h5>{{ theatre.street }}</h5>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p>No theatres available.</p>
+    {% endif %}
+
+
+
+    </div>
+  </body>
+</html>

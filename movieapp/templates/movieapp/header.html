@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {% load static %}
+    <meta charset="utf-8">
+    <title>Finnkino</title>
+    <meta name="viewport" content="width=device-width, height=device-height initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.16.0/jquery.validate.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.12/p5.min.js"></script>
+
+    <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  </head>
+  <body ng-app="">
+    <div class="container">
+      <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a href="{% url 'index' %}" class="navbar-brand nav_text">Finnkino</a>
+          </div>
+          <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+              <!--Categories-->
+              <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Categories <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                  <li><a href="{% url 'movies_by_genre' 'Action' %}">Action</a></li>
+                  <li><a href="{% url 'movies_by_genre' 'Comedy' %}">Comedy</a></li>
+                  <li><a href="{% url 'movies_by_genre' 'Romantic' %}">Romantic</a></li>
+                  <li><a href="{% url 'movies_by_genre' 'Horror' %}">Horror</a></li>
+                  <li><a href="{% url 'movies_by_genre' 'Indie' %}">Indie</a></li>
+                  <li><a href="{% url 'movies_by_genre' 'Kids' %}">Kids</a></li>
+                </ul>
+              </li>
+              <!--Shows-->
+              <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Shows <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                  <li><a href="{% url 'shows_by_city' 'Turku' %}">Turku</a></li>
+                  <li><a href="{% url 'shows_by_city' 'Tampere' %}">Tampere</a></li>
+                  <li><a href="{% url 'shows_by_city' 'Helsinki' %}">Helsinki</a></li>
+                </ul>
+              </li>
+              <li><a href="{% url 'theatres' %}">Find us</a></li>
+              {% if user.is_authenticated %}
+                {% if user.is_superuser %}
+                  <li><a href="{% url 'admin:index' %}">Admin</a></li>
+                {% endif %}
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                  <li><a class="nav_text" id="welcome_text">Welcome, {{ user }}</a></li>
+                  <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-user" aria-hidden="true"><span class="caret"></span></span></a>
+                    <ul class="dropdown-menu">
+                      <li><a href="{% url 'profile' %}">Profile</a></li>
+                      <li><a href="{% url 'logout' %}">Logout</a></li>
+                    </ul>
+                  </li>
+                </ul>
+              {% else %}
+                <li><a href="{% url 'signup' %}">Sign up</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                  <li><a href="#login" data-toggle="modal" data-target="#login">Login <span class="glyphicon glyphicon-log-in" aria-hidden="true"></span></a><li>
+                </ul>
+
+                <!-- Modal -->
+                <div class="modal fade" id="login" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Login</h4>
+                      </div>
+                      <div class="modal-body">
+                        <form class="form-group" action="{% url 'login_view' %}" method="post">
+                          {% csrf_token %}
+                            <input class="form-control" type="text" name="username" placeholder="Username">
+                            <input class="form-control" type="password" name="password" placeholder="Password">
+                            <input type="hidden" name="next" value="{{ request.path }}">
+                            <input class="form-control btn btn-primary" type="submit" value="Login">
+                          </form>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+
+             {% endif %}
+
+             <form class="navbar-form navbar-left" action="{% url 'search' %}" method="post">
+               <div class="form-group">
+                 {% csrf_token %}
+                 <input type="text" class="form-control" name="text" placeholder="Search" autocomplete="off">
+               </div>
+               <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+             </form>
+
+          </div>
+      </nav>
+      <hr>
+
+      {% for message in messages %}
+        <div class="alert {{ message.tags }} alert-dismissible" role="alert">
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          {{ message }}
+        </div>
+      {% endfor %}
+
+      <script>
+        $(".alert-success").fadeTo(2000, 500).slideUp(500, function(){ //onnistuneen operaation viestin poistumisanimaatio jQueryllä
+          $(".alert-success").slideUp(500);
+        });
+
+        $(".alert-danger").fadeTo(2000, 500).slideUp(500, function(){ //epäonnistuneen operaation viestin poistumisanimaatio jQueryllä
+          $(".alert-danger").slideUp(500);
+        });
+      </script>

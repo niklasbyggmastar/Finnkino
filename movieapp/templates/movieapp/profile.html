@@ -1,0 +1,99 @@
+{% include 'movieapp/header.html' %}
+
+{% if user.is_authenticated %}
+    {% if my_tickets %}
+    <div>
+      <h2>My tickets</h2>
+      <table class='table table-hover'>
+          <thead>
+            <tr>
+              <th>Ticket ID</th>
+              <th>Movie</th>
+              <th>Theatre</th>
+              <th>Auditorium</th>
+              <th>Time</th>
+              <th>Row</th>
+              <th>Seat</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+
+      {% for ticket in my_tickets %}
+        <tr>
+          <td>{{ ticket.id }}</td>
+          <td>{{ ticket }}</td>
+          <td>{{ ticket.show.theatre }}</td>
+          <td>{{ ticket.show.auditorium }}</td>
+          <td>{{ ticket.show.show_time }}</td>
+          <td>{{ ticket.seat_row }}</td>
+          <td>{{ ticket.seat_col }}</td>
+          <td>
+            <form action="{% url 'remove_ticket' ticket.id %}" method="post">
+            {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.path }}">
+                <input class="btn btn-danger btn-xs" type="submit" value="x">
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+
+      </tbody>
+      </table>
+    </div>
+
+    {% else %}
+      <h4>You have no movie tickets.</h4>
+      <br>
+    {% endif %}
+    <br>
+<hr>
+  <!--  <div class="col-md-4" style="border-right: solid rgb(147,147,147) 1px;">
+      <h4>Change password</h4>
+
+    </div> -->
+    <div class="col-md-6" style="border-right: solid rgb(147,147,147) 1px;">
+      <a href="#change_info" style="float:right;" data-toggle="modal" data-target="#change_info">change password</a>
+      <h4>Username: {{ user }}</h4>
+      <h4>Email: {{ user.email }}</h4>
+      <h4>First name: {{ request.user.first_name }}</h4>
+      <h4>Last name: {{ request.user.last_name }}</h4>
+    </div>
+{% else %}
+    <script>
+      location.href = "../";
+    </script>
+{% endif %}
+
+
+<div class="modal fade" id="change_info" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Change password</h4>
+      </div>
+      <div class="modal-body">
+        <form id="change_password" class="form-group" action="{% url 'change_password' %}" method="post">
+          {% csrf_token %}
+          <label>Old password</label>
+          <input class="form-control" type="password" name="old_password" required="true">
+          <label>New password</label>
+          <input class="form-control" type="password" name="new_password" required="true">
+          <label>Confirm password</label>
+          <input class="form-control" type="password" name="new_password2" required="true">
+          <input type="hidden" name="next" value="{{ request.path }}">
+          <br>
+          <input class="form-control btn btn-primary" type="submit" value="Submit">
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+
+    </div>
+  </body>
+</html>

@@ -1,0 +1,22 @@
+{% include 'movieapp/header.html' %}
+
+  {% if all_shows %}
+    <h2>Shows in {{ city }}</h2>
+    <ul>
+      {% for show in all_shows %}
+      <div class="col-md-3" style="margin-top:10px;">
+        <a href="{% url 'info' show.movie.id %}">
+          <img class="img img-thumbnail poster" src="../../../{{ show.movie.poster }}" alt="{{ show.movie.title }}">
+          <label>{{ show.movie.title }}</label>
+        </a>
+      </div>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <h4 class="alert-danger text-center">No shows available in this city.</h4>
+  {% endif %}
+
+
+      </div>
+    </body>
+  </html>

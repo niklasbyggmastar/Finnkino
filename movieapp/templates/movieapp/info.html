@@ -1,0 +1,140 @@
+{% include 'movieapp/header.html' %}
+
+      <h2 class="text-center">{{ title }}</h2>
+      <br>
+      <div class="col-md-6 col-md-offset-1">
+        <br>
+        <h4><li><strong>Released: </strong> {{ released.date }}</li></h4>
+        <h4><li><strong>Genre: </strong> {{ genre }}</li></h4>
+        <h4><li><strong>Duration: </strong> {{ duration_mins }} minutes</li></h4>
+        <h4><li><strong>Description: </strong> {{ description }}</li></h4>
+        <br>
+        <a href="../"><button type="button" class="btn btn-info" onclick="javascript:history.go(-1)">Back</button></a> <!-- hyi -->
+      </div>
+      <div class="col-md-5 text-center">
+        <a href="#poster" data-toggle="modal" data-target="#poster"><img class="img img-thumbnail img-info" src="../../{{ poster }}" alt="Poster"></a>
+      </div>
+
+      <!-- Modal -->
+      <div class="modal fade" id="poster" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+              <img class="img img-responsive" src="../../{{ poster }}" alt="Poster">
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+    <ul class="nav nav-tabs">
+       <li class="active"><a data-toggle="tab" href="#buy">Buy tickets</a></li>
+       <li><a data-toggle="tab" href="#reviews">Reviews</a></li>
+     </ul>
+
+                              <!---   BUY TICKETS   --->
+
+     <div class="tab-content">
+       <div id="buy" class="tab-pane fade in active">
+         {% if all_shows %}
+          <h3>Buy tickets</h3>
+          <br>
+          <div class="col-md-5">
+            <form class="form-group" action="{% url 'buy' %}" method="post">
+              {% csrf_token %}
+              <select name="showID" class="form-control">
+              {% for show in all_shows %}
+                <option value="{{ show.id }}">{{ show.city }} || {{ show.show_time }} || {{ show.theatre }} || {{ show.auditorium }}</option>
+              {% endfor %}
+              </select>
+              <input class="btn btn-primary form-control" type="submit" value="Buy tickets">
+            </form>
+          </div>
+        {% else %}
+          <h4 class="alert-danger text-center">No shows available for this movie.</h4>
+        {% endif %}
+       </div>
+
+                               <!---   REVIEWS   --->
+       <div id="reviews" class="tab-pane fade">
+         <h3>Reviews</h3>
+         {% if user.is_authenticated %}
+           {% if not all_reviews %}
+             <div class="col-md-6" style="margin-top:20px;">
+               <h4 class="text-center"><strong>Be the first to review!</strong></h4>
+               <form id="review_form" class="form-group" action="{% url 'post_comment' movieID %}" method="post">
+                 {% csrf_token %}
+                 <label>Stars (0-5)</label>
+                 <input class="form-control" min="1" max="5" type="number" name="stars">
+                 <label>Comment</label>
+                 <input class="form-control" type="text" name="comment"><br>
+                 <input type="hidden" name="next" value="{{ request.path }}">
+                 <input class="form-control btn btn-primary" type="submit" value="Submit">
+               </form>
+             </div>
+           {% else %}
+             <div class="col-md-6" style="margin-top:20px;">
+               <form id="review_form" class="form-group" action="{% url 'post_comment' movieID %}" method="post">
+                 {% csrf_token %}
+                 <label>Stars (0-5)</label>
+                 <input class="form-control" min="0" max="5" type="number" name="stars">
+                 <label>Comment</label>
+                 <input class="form-control" type="text" name="comment"><br>
+                 <input type="hidden" name="next" value="{{ request.path }}">
+                 <input class="form-control btn btn-primary" maxlength="500" type="submit" value="Submit">
+               </form>
+             </div>
+             <div class="col-md-6" style="margin-top:20px;">
+               <!--<h4 class="text-center"><strong>:</strong></h4>-->
+               <ul>
+                 {% for review in all_reviews %}
+                 <div style="background-color:white; margin-top:5px; border-radius:10px; padding:15px;">
+                   <li>User: {{ review.user }}</li>
+                   <li>Released: {{ review.released }}</li>
+                   <li>Stars:
+                     {% if review.stars == 1 %}                                                  <!-- Disgusting -->
+                       <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                     {% elif review.stars == 2 %}
+                       <span class="glyphicon glyphicon-star" aria-hidden="true"></span><span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                     {% elif review.stars == 3 %}
+                       <span class="glyphicon glyphicon-star" aria-hidden="true"></span><span class="glyphicon glyphicon-star" aria-hidden="true"></span><span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                     {% elif review.stars == 4 %}
+                       <span class="glyphicon glyphicon-star" aria-hidden="true"></span><span class="glyphicon glyphicon-star" aria-hidden="true"></span><span class="glyphicon glyphicon-star" aria-hidden="true"></span><span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                     {% elif review.stars == 5 %}
+                       <span class="glyphicon glyphicon-star" aria-hidden="true"></span><span class="glyphicon glyphicon-star" aria-hidden="true"></span><span class="glyphicon glyphicon-star" aria-hidden="true"></span><span class="glyphicon glyphicon-star" aria-hidden="true"></span><span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                     {% endif %}
+                   </li>
+                   <li>Comment: {{ review.comment }}</li>
+                 </div>
+                 {% endfor %}
+               </ul>
+             </div>
+           {% endif %}
+         {% else %}
+           <p><strong>Login to post a review!</strong></p>
+         {% endif %}
+       </div>
+     </div>
+
+    </div>
+
+    <script>
+      $(function(){
+        $("#review_form").validate({
+          rules:{
+            stars: {required:true},
+            comment: {required:true},
+          },
+          messages:{
+            stars: {required:"Enter the stars!"},
+            comment: {required:"Enter your comment!"},
+          }
+        });
+      });
+    </script>
+
+  </body>
+</html>

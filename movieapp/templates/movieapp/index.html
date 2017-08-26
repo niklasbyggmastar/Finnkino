@@ -1,0 +1,21 @@
+{% include 'movieapp/header.html' %}
+
+    <h2>Latest movies</h2>
+      {% if latest_movies %}
+        <ul>
+          {% for movie in latest_movies %}
+          <div class="col-md-3" style="margin-top:10px;">
+            <a href="{% url 'info' movie.id %}">
+              <img class="img img-thumbnail poster" src="../{{ movie.poster }}" alt="{{ movie.title }}">
+              <label>{{ movie.title }}</label>
+            </a>
+          </div>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <h4 class="alert-danger text-center">No movies available</h4>
+      {% endif %}
+
+    </div>
+  </body>
+</html>

@@ -1,0 +1,18 @@
+{% include 'movieapp/header.html' %}
+
+<h2>Search for: "{{ search_text }}"</h2>
+
+{% if results %}
+  {% for result in results %}
+    <div class="col-md-3" style="margin-top:10px;">
+      <a href="{% url 'info' result.id %}">
+        <img class="img img-thumbnail poster" src="../../{{ result.poster }}" alt="{{ result.title }}">
+        <label>{{ result.title }}</label>
+      </a>
+    </div>
+  {% endfor %}
+{% endif %}
+
+    </div>
+  </body>
+</html>

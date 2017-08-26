@@ -1,0 +1,17 @@
+{% include 'movieapp/header.html' %}
+
+{% if all_movies %}
+  <h2>{{ genre }} movies</h2>
+  <ul>
+    {% for movie in all_movies %}
+    <div class="col-md-3" style="margin-top:10px;">
+      <a href="{% url 'info' movie.id %}">
+        <img class="img img-thumbnail poster" src="../../../{{ movie.poster }}" alt="{{ movie.title }}">
+        <label>{{ movie.title }}</label>
+      </a>
+    </div>
+    {% endfor %}
+  </ul>
+{% else %}
+  <h4 class="alert-danger text-center">No movies yet available in this genre.</h4>
+{% endif %}
